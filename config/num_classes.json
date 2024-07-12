@@ -1,0 +1,31 @@
+{
+	"training": {
+		"method": "Adam",
+		"opt_params": {
+			"lr": 3e-4
+		},
+		"lr_scheduler": "const",
+		"batch_size": 128,
+		"epochs": 500,
+		"steps": -1,
+		"gamma_conc": 1.0,
+		"gamma_rate": 0.25,
+		"field_magnitude": 0.5,
+		"t_end": 15,
+		"integrator": "rk4",
+		"step_size": 0.2
+	},
+	"data": {
+		"dataset": "simplex_stark",
+		"num_classes": 10,
+		"integer_smoothing": 0.01,
+		"batches_per_epoch": 500,
+		"num_val_batches": 32
+	},
+	"model": "cnn_dirichlet",
+	"model_params": {},
+	"logging": {
+		"eval_interval_epochs": 250,
+		"check_interval_epochs": 250
+	}
+}

@@ -1,3 +1,8 @@
+# Data
+data/image/cityscapes
+data/image/mnist
+data/image/omniglot
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

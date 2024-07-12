@@ -1,0 +1,33 @@
+{
+	"training": {
+		"method": "Adam",
+		"opt_params": {
+			"lr": 3e-4
+		},
+		"lr_scheduler": "CosineAnnealing",
+		"batch_size": 256,
+		"epochs": 250,
+		"gamma_conc": 1.0,
+		"gamma_rate": 0.5,
+		"field_magnitude": 0.5,
+		"t_end": 10,
+		"integrator": "rk4",
+		"step_size": 0.2
+	},
+	"data": {
+		"dataset": "mnist",
+		"restrict_digit": -1,
+		"integer_smoothing": 0.01
+	},
+	"model": "unet",
+	"model_params": {
+		"model_channels": 32,
+		"attention_resolutions": [16],
+		"channel_mult": [1,2,2,2],
+		"num_res_blocks": 2
+	},
+	"logging": {
+		"eval_interval_epochs": 20,
+		"check_interval_epochs": 50
+	}
+}

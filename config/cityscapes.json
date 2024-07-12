@@ -1,0 +1,35 @@
+{
+	"training": {
+		"method": "Adam",
+		"opt_params": {
+			"lr": 3e-4
+		},
+		"lr_scheduler": "CosineAnnealing",
+		"batch_size": 4,
+		"epochs": 250,
+		"steps": -1,
+		"gamma_conc": 1.0,
+		"gamma_rate": 0.25,
+		"field_magnitude": 0.5,
+		"t_end": 15,
+		"integrator": "rk4",
+		"step_size": 0.2
+	},
+	"data": {
+		"dataset": "cityscapes",
+		"scale": 0.125,
+		"num_classes": 8,
+		"integer_smoothing": 0.01
+	},
+	"model": "unet",
+	"model_params": {
+		"model_channels": 64,
+		"attention_resolutions": [32,16,8],
+		"channel_mult": [1,1,2,3,4],
+		"num_res_blocks": 3
+	},
+	"logging": {
+		"eval_interval_batches": 1500,
+		"check_interval_batches": 25000
+	}
+}
