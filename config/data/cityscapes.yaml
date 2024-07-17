@@ -1,0 +1,4 @@
+dataset: "cityscapes"
+scale: 0.125
+num_classes: 8
+integer_smoothing: 0.01

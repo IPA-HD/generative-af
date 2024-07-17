@@ -1,0 +1,3 @@
+dataset: "gaussian_mixture"
+integer_smoothing: 0.01
+batches_per_epoch: 500

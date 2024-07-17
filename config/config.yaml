@@ -1,0 +1,5 @@
+defaults:
+  - training: mnist
+  - data: mnist
+  - model: unet
+  - logging: mnist
