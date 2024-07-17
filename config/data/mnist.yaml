@@ -1,0 +1,3 @@
+dataset: "mnist"
+restrict_digit: -1
+integer_smoothing: 0.01

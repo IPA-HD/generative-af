@@ -1,0 +1,6 @@
+name: "unet"
+params:
+  model_channels: 32
+  attention_resolutions: [16]
+  channel_mult: [1,2,2,2]
+  num_res_blocks: 2

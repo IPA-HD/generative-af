@@ -1,0 +1,12 @@
+method: "Adam"
+opt_params:
+  lr: 3e-4
+lr_scheduler: "CosineAnnealing"
+batch_size: 256
+epochs: 250
+gamma_conc: 1.0
+gamma_rate: 0.5
+field_magnitude: 0.5
+t_end: 10
+integrator: "rk4"
+step_size: 0.2

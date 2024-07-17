@@ -1,0 +1,4 @@
+name: "dense"
+params:
+  hidden_dims: [256, 256]
+  bias: true

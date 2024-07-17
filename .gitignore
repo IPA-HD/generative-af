@@ -3,6 +3,10 @@ data/image/cityscapes
 data/image/mnist
 data/image/omniglot
 
+# Logs
+lightning_logs/
+outputs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

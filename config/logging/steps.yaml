@@ -1,0 +1,2 @@
+eval_interval_batches: 1500
+check_interval_batches: 25000
