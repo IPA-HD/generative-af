@@ -3,3 +3,5 @@ defaults:
   - data: mnist
   - model: unet
   - logging: mnist
+
+debug: false

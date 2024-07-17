@@ -18,8 +18,8 @@ class FlowMatchingModule(L.LightningModule):
 	def __init__(self, hparams):
 		super(FlowMatchingModule, self).__init__()
 		self.save_hyperparameters()
-		self.model_params = hparams["model_params"]
-		self.training_params = hparams["training"]
+		self.model_params = hparams.model.params
+		self.training_params = hparams.training
 		self.integration_params = {
 			"method": read("integrator", self.training_params, default="dopri5")
 		}
@@ -30,7 +30,7 @@ class FlowMatchingModule(L.LightningModule):
 			self.integration_params["options"] = {"step_size": read("step_size", self.training_params, default=1e-1)}
 		self.t_end = read("t_end", self.training_params, default=1.0)
 		# extract data format
-		self.data = new_curriculum(hparams["data"])
+		self.data = new_curriculum(hparams.data)
 		self.tensor_format = self.data.tensor_format()
 		self.data_dims = self.tensor_format[1:]
 
@@ -41,7 +41,7 @@ class FlowMatchingModule(L.LightningModule):
 		concentration = read("gamma_conc", self.training_params, default=2.0)
 		rate = read("gamma_rate", self.training_params, default=0.4)
 		g = Gamma(concentration, rate)
-		t_end = self.training_params["t_end"]
+		t_end = self.training_params.t_end
 		t = torch.linspace(0.0, t_end, steps=100)
 		density = g.log_prob(t).exp()
 		fig, ax = plt.subplots(1,1)
@@ -72,19 +72,19 @@ class FlowMatchingModule(L.LightningModule):
 		return loss
 
 	def configure_optimizers(self):
-		assert self.training_params["method"] in ["SGD", "Adam", "AdamW"]
-		if self.training_params["method"] == "SGD":
-			optimizer = optim.SGD(self.net.parameters(), **self.training_params["opt_params"])
-		elif self.training_params["method"] == "Adam":
-			optimizer = optim.Adam(self.net.parameters(), **self.training_params["opt_params"])
+		assert self.training_params.method in ["SGD", "Adam", "AdamW"]
+		if self.training_params.method == "SGD":
+			optimizer = optim.SGD(self.net.parameters(), **self.training_params.opt_params)
+		elif self.training_params.method == "Adam":
+			optimizer = optim.Adam(self.net.parameters(), **self.training_params.opt_params)
 		else:
-			optimizer = optim.AdamW(self.net.parameters(), **self.training_params["opt_params"])
+			optimizer = optim.AdamW(self.net.parameters(), **self.training_params.opt_params)
 
-		assert self.training_params["lr_scheduler"] in ["const", "CosineAnnealing"]
-		if self.training_params["lr_scheduler"] == "const":
+		assert self.training_params.lr_scheduler in ["const", "CosineAnnealing"]
+		if self.training_params.lr_scheduler == "const":
 			return optimizer
 
-		schedule = optim.lr_scheduler.CosineAnnealingLR(optimizer, self.training_params["epochs"])
+		schedule = optim.lr_scheduler.CosineAnnealingLR(optimizer, self.training_params.epochs)
 		return {"optimizer": optimizer, "lr_scheduler": schedule}
 
 class ImageFlow(FlowMatchingModule):
@@ -116,10 +116,10 @@ class ToyDataFlow(FlowMatchingModule):
 	"""
 	def __init__(self, hparams):
 		super(ToyDataFlow, self).__init__(hparams)
-		assert hparams["model"] in ["cnn_dirichlet", "dense"]
-		if hparams["model"] == "cnn_dirichlet":
-			assert hparams["data"]["dataset"] == "simplex_stark"
-			self.c = hparams["data"]["num_classes"]
+		assert hparams.model.name in ["cnn_dirichlet", "dense"]
+		if hparams.model.name == "cnn_dirichlet":
+			assert hparams.data.dataset == "simplex_stark"
+			self.c = hparams.data.num_classes
 			self.n = 4
 			self.net = DirichletCNN(self.c)
 		else:
