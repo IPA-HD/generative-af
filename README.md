@@ -2,6 +2,12 @@
 This repository contains code associated with [Generative Assignment Flows for Representing and Learning Joint Distributions of Discrete Data](https://arxiv.org/abs/2406.04527v1).
 It was developed by the [Image \& Pattern Analysis Group](https://ipa.math.uni-heidelberg.de) at Heidelberg University.
 
+## Runtime Environment
+The quickest way to get up and running is by creating a new conda environment `gen-af` from the provided environment file
+```Bash
+conda env create --file environment.yaml
+```
+
 ## Configuration
 Training hyperparameters are specified by YAML configuration files in `config/`. We use [hydra](https://hydra.cc/docs/intro/) to parse these files hierarchically, which also allows overwriting from the command line.
 
@@ -18,7 +24,7 @@ python train.py data=cityscapes logging=steps model=unet training=cityscapes
 ```Bash
 python train.py data=simple data.dataset=pinwheel logging=frequent model=dense training=simple
 ```
-Options for `data.dataset` are `pinwheel`, `gaussian_mixture` and `coupled_binary`.
+If `data=simple` is set, options for `data.dataset` are `pinwheel`, `gaussian_mixture` and `coupled_binary`.
 
 Training artifacts, including model checkpoints, Tensorboard logs and hyperparameters are saved in `lightning_logs/`.
 

@@ -7,9 +7,9 @@ from .simple_distr import *
 
 def new_curriculum(dataset_params):
 	"""
-	Returns object conforming to the Curriculum protocol and matching the specified configuration.
+	Returns a training curriculum based on the specified configuration.
 	The instantiation of these objects does not load significant amounts of data from disk, 
-	so it can be used to merely access dataset or distribution metadata.
+	so it can be used to merely access dataset- or distribution metadata.
 	"""
 	if dataset_params["dataset"] == "mnist":
 		return BinarizedMNIST(dataset_params)

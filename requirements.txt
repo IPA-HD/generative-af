@@ -1,3 +1,0 @@
-torchdiffeq
-tensorboard
-hydra-core

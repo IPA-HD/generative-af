@@ -8,7 +8,9 @@ from torch.utils.data import DataLoader
 import os
 
 class ImageOnlyDataLoader(DataLoader):
-    """Wrapper for torchvision DataLoader which removes the labels from each batch."""
+    """
+    Wrapper for torchvision DataLoader which removes the labels from each batch.
+    """
     def __init__(self, dataset, **kwargs):
         super(ImageOnlyDataLoader, self).__init__(dataset, **kwargs)
     
