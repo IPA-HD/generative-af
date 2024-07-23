@@ -6,8 +6,10 @@ import torch
 from torch.nn.functional import softmax
 from util import mean_free, replicator, read
 from torch.distributions.gamma import Gamma
+from omegaconf import DictConfig
+from typing import Callable
 
-def matching_step(w1, net, training_config, dim=1):
+def matching_step(w1: torch.Tensor, net: Callable, training_config: DictConfig, dim: int = 1):
     device = w1.device
     batch_size = w1.shape[0]
 
@@ -20,7 +22,7 @@ def matching_step(w1, net, training_config, dim=1):
     concentration = read("gamma_conc", training_config, default=2.0)
     rate = read("gamma_rate", training_config, default=0.4)
     g = Gamma(concentration, rate)
-    t = g.sample((batch_size, *([1]*(w1.ndim-1)))).to(device)
+    t = g.sample(torch.Size([batch_size, *([1]*(w1.ndim-1))])).to(device)
 
     magnitude = read("field_magnitude", training_config, default=1.0)
     v1 /= torch.linalg.vector_norm(v1, dim=dim, keepdim=True)

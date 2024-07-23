@@ -4,7 +4,7 @@ Assignment flow integration routines.
 import torch
 from torch.nn.functional import softmax
 from util import mean_free
-from torchdiffeq import odeint
+from torchdiffeq import odeint # type: ignore
 
 def integrate_af(v0, F, dim=1, t_end=1.0, **integrator_args):
     v = mean_free(v0, dim=dim)

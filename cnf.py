@@ -32,13 +32,13 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchdiffeq import odeint_adjoint as odeint
+from torchdiffeq import odeint_adjoint as odeint # type: ignore
 
-from icecream import ic
 from torch.autograd.functional import jacobian
 from tqdm import tqdm
+from typing import Callable, Optional
 
-def divergence_bf_jac(fx, y, **unused_kwargs):
+def divergence_bf_jac(fx: Callable, y: torch.Tensor, **unused_kwargs):
     div = torch.zeros(y.shape[0], 1)
     for i in tqdm(range(y.shape[0])):
         # sequential over batch dimension
@@ -46,7 +46,7 @@ def divergence_bf_jac(fx, y, **unused_kwargs):
         div[i,0] = torch.trace(J.reshape(2,2))
     return div
 
-def divergence_bf_unit(f, y, **unused_kwargs):
+def divergence_bf_unit(f: Callable, y: torch.Tensor, **unused_kwargs):
     """
     Brute-force exact divergence by backward passes of unit
     vectors. This is parallel over the batch dimension and
@@ -64,16 +64,15 @@ def divergence_bf_unit(f, y, **unused_kwargs):
         func_output.backward(ek.reshape(y.shape), retain_graph=True)
         div[:,0] += y.grad.reshape(batch_size,-1)[:,k]
         y.grad.zero_()
-    #print("divergence", div.flatten())
     return div
 
-def divergence_bf(dx, y, **unused_kwargs):
+def divergence_bf(dx: torch.Tensor, y: torch.Tensor, **unused_kwargs):
     sum_diag = 0.
     for i in range(y.shape[1]):
         sum_diag += torch.autograd.grad(dx[:, i].sum(), y, create_graph=True)[0].contiguous()[:, i].contiguous()
     return sum_diag.contiguous()
 
-def divergence_approx(f, y, e=None):
+def divergence_approx(f: Callable, y: torch.Tensor, e: Optional[torch.Tensor] = None):
     # hutchinson estimator with multiple draws
     approx_div = torch.zeros(y.shape[0], 1, device=y.device)
     num_samples = y.shape[0]
@@ -85,24 +84,18 @@ def divergence_approx(f, y, e=None):
         approx_div += (y.grad * z).reshape(num_samples, -1).sum(dim=1, keepdim=True)
         y.grad.zero_()  # Reset gradients for next iteration
     approx_div /= e.shape[0]
-    #print("approx divergence", approx_div.flatten())
     return approx_div
 
-# def divergence_approx(f, y, e=None):
-#     e_dzdx = torch.autograd.grad(f, y, e, create_graph=True)[0]
-#     e_dzdx_e = e_dzdx * e
-#     approx_tr_dzdx = e_dzdx_e.reshape(y.shape[0], -1).sum(dim=1)
-#     return approx_tr_dzdx
-
-def sample_rademacher(y, num_repetitions=100):
+def sample_rademacher(y: torch.Tensor, num_repetitions: int = 100):
     return torch.sign(sample_gaussian(y, num_repetitions))
 
-def sample_gaussian(y, num_repetitions=100):
+def sample_gaussian(y: torch.Tensor, num_repetitions: int = 100):
     return torch.randn(num_repetitions, *y.shape, device=y.device)
 
 class ODEfunc(nn.Module):
 
-    def __init__(self, diffeq, div_method="hutchinson_gauss", hutchinson_samples=100, residual=False, rademacher=False):
+    def __init__(self, diffeq: Callable, div_method: str = "hutchinson_gauss", 
+            hutchinson_samples: int = 100, residual: bool = False, rademacher: bool = False):
         super(ODEfunc, self).__init__()
         
         # self.diffeq = diffeq_layers.wrappers.diffeq_wrapper(diffeq)
@@ -117,16 +110,16 @@ class ODEfunc(nn.Module):
 
         self._e = None
 
-    def before_odeint(self, e=None):
+    def before_odeint(self, e: torch.Tensor = None):
         self._e = e
         self._num_evals.fill_(0)
 
     def num_evals(self):
         return self._num_evals.item()
 
-    def forward(self, t, states):
+    def forward(self, t: torch.Tensor, states: list[torch.tensor]):
         assert len(states) >= 2
-        y = states[0]
+        y: torch.Tensor = states[0]
 
         # increment num evals
         self._num_evals += 1

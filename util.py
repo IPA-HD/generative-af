@@ -1,40 +1,44 @@
 import math
 import torch
 from torch.nn.functional import softmax
-from matplotlib.cm import ScalarMappable
+from matplotlib.cm import ScalarMappable # type: ignore
 from torch.special import entr
 import random
 import string
+from omegaconf import DictConfig
+from typing import Any, Iterator
 
 class DummyDataloader(object):
     """for validation without data"""
-    def __init__(self, num_val_batches=1):
+    def __init__(self, num_val_batches: int = 1):
         super(DummyDataloader, self).__init__()
         self.num_val_batches = num_val_batches
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Any]:
         return iter(self.num_val_batches*[None])
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self.num_val_batches
 
-def generate_random_id(size=4):
+def generate_random_id(size: int = 4) -> str:
     return "".join(random.choice(string.ascii_letters) for _ in range(size))
 
-def mean_entropy(w, dim=1):
+def mean_entropy(w: torch.Tensor, dim: int = 1) -> torch.Tensor:
     c = w.shape[dim]
-    return entr(w).sum(dim=dim).mean() / math.log(c)
+    entropy: torch.Tensor = entr(w).sum(dim=dim).mean() / math.log(c)
+    return entropy
 
-def logmeanexp(x, dim):
-    return torch.logsumexp(x, dim=dim) - math.log(x.shape[dim])
+def logmeanexp(x: torch.Tensor, dim: int) -> torch.Tensor:
+    lme: torch.Tensor = torch.logsumexp(x, dim=dim) - torch.tensor([math.log(x.shape[dim])])
+    return lme
 
-def read(key, config, default=None):
+def read(key: str, config: DictConfig, default: Any = None) -> Any:
     if key in config.keys():
         return config[key]
     print(f"WARNING: \"{key}\" not configured, defaulting to {default}")
     return default
 
-def labeling_as_colors(x, c):
+def labeling_as_colors(x: torch.Tensor, c: int) -> list[torch.Tensor]:
     if x.ndim == 2:
         x = x.unsqueeze(-1)
     assert x.ndim == 3 # batch dimensions is assumed
@@ -44,23 +48,25 @@ def labeling_as_colors(x, c):
     rgb_tensors = [torch.movedim(torch.from_numpy(y), -1, 0) for y in rgb_vals]
     return rgb_tensors
 
-def loglh_to_bitsperdim(log_lh, dim):
+def loglh_to_bitsperdim(log_lh: torch.Tensor | float, dim: int) -> torch.Tensor | float:
     return -log_lh / math.log(2) / dim
 
-def lift(W, V, dim=1):
+def lift(W: torch.Tensor, V: torch.Tensor, dim: int = 1) -> torch.Tensor:
     return softmax(V + torch.log(W), dim=dim)
 
-def mean_free(x, dim=1):
+def mean_free(x: torch.Tensor, dim: int = 1) -> torch.Tensor:
     """
     Project vector to the tangent space T_0W.
     """
-    return x - x.mean(dim=dim, keepdim=True)
+    xp: torch.Tensor = x - x.mean(dim=dim, keepdim=True)
+    return xp
 
-def standard_normal_logprob(z):
-    logZ = -0.5 * math.log(2 * math.pi)
-    return logZ - z.pow(2) / 2
+def standard_normal_logprob(z: torch.Tensor) -> torch.Tensor:
+    logZ: torch.Tensor = -0.5 * math.log(2 * math.pi) - z.pow(2) / 2
+    return logZ 
 
-def replicator(s0, v, dim=1):
+def replicator(s0: torch.Tensor, v: torch.Tensor, dim: int = 1) -> torch.Tensor:
     assert v.ndim == s0.ndim
     s0v = s0*v
-    return s0v - s0v.sum(dim=dim, keepdim=True)*s0
+    Rs: torch.Tensor = s0v - s0v.sum(dim=dim, keepdim=True)*s0
+    return Rs

@@ -3,10 +3,9 @@ Network architectures
 """
 import torch.nn as nn
 import torch
-from .counter import count_forward_calls
+from .base import Vectorfield
 
-@count_forward_calls
-class DenseNet(nn.Module):
+class DenseNet(Vectorfield):
     """Dense Layers, ReLU activation, BatchNorm"""
     def __init__(self, c, n, hidden_dims, bias=True):
         super(DenseNet, self).__init__()
@@ -34,7 +33,7 @@ class DenseNet(nn.Module):
             print("Warning: data used for training do not match expected spatial dimensions. Expected", (self.c, self.n), "got", batch_shape[1:])
         return True
 
-    def forward(self, x, timesteps=None):
+    def counted_forward(self, x, timesteps=None):
         batch_size = x.shape[0]
         other_dims = x.shape[1:]
         if timesteps is None:

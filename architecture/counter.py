@@ -2,6 +2,9 @@
 Architecture decorators tracking metadata.
 """
 from functools import wraps
+from typing import Protocol, Optional
+from abc import abstractmethod
+import torch
 
 def count_forward_calls(cls):
     """
@@ -20,7 +23,7 @@ def count_forward_calls(cls):
     cls.forward = counted_forward
     
     def reset_forward_count(self):
-    	setattr(self, counter_name, 0)
+        setattr(self, counter_name, 0)
 
     # Method to get the count
     def get_forward_count(self):

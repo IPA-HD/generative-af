@@ -4,6 +4,7 @@ https://github.com/openai/guided-diffusion
 """
 
 from abc import abstractmethod
+from typing import Optional
 
 import numpy as np
 import torch as th
@@ -11,7 +12,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 import math
-from .counter import count_forward_calls
+from .base import Vectorfield
 
 
 # PyTorch 1.7 has SiLU, but we support PyTorch 1.5.
@@ -204,7 +205,7 @@ class AttentionPool2d(nn.Module):
         spacial_dim: int,
         embed_dim: int,
         num_heads_channels: int,
-        output_dim: int = None,
+        output_dim: Optional[int] = None,
     ):
         super().__init__()
         self.positional_embedding = nn.Parameter(
@@ -567,8 +568,7 @@ class QKVAttention(nn.Module):
     def count_flops(model, _x, y):
         return count_flops_attn(model, _x, y)
 
-@count_forward_calls
-class UNetModel(nn.Module):
+class UNet(Vectorfield):
     """
     The full UNet model with attention and timestep embedding.
 
@@ -807,7 +807,7 @@ class UNetModel(nn.Module):
         self.middle_block.apply(convert_module_to_f32)
         self.output_blocks.apply(convert_module_to_f32)
 
-    def forward(self, x, timesteps, y=None):
+    def counted_forward(self, x, timesteps):
         """
         Apply the model to an input batch.
 
@@ -816,6 +816,7 @@ class UNetModel(nn.Module):
         :param y: an [N] Tensor of labels, if class-conditional.
         :return: an [N x C x ...] Tensor of outputs.
         """
+        y = None
         assert (y is not None) == (
             self.num_classes is not None
         ), "must specify y if and only if the model is class-conditional"
@@ -840,9 +841,9 @@ class UNetModel(nn.Module):
         return self.out(h)
 
 
-class SuperResModel(UNetModel):
+class SuperResModel(UNet):
     """
-    A UNetModel that performs super-resolution.
+    A UNet that performs super-resolution.
 
     Expects an extra kwarg `low_res` to condition on a low-resolution image.
     """
@@ -857,7 +858,7 @@ class SuperResModel(UNetModel):
         return super().forward(x, timesteps, **kwargs)
 
 
-class EncoderUNetModel(nn.Module):
+class EncoderUNet(nn.Module):
     """
     The half UNet model with attention and timestep embedding.
 
