@@ -53,7 +53,7 @@ class SimpleDataDistr(object):
         self.c = self.joint_pmf.shape[0]
         self.n = self.joint_pmf.ndim
         self.batches_per_epoch = dataset_params["batches_per_epoch"]
-        self.smoothing = dataset_params["integer_smoothing"]
+        self.smoothing = 0.01
     
     def sample(self, batch_size: int | tuple[int]) -> torch.Tensor:
         """
@@ -203,7 +203,7 @@ class StarkSimplexDistribution(object):
         self.n = 4
         self.c = dataset_params["num_classes"]
         self.batches_per_epoch = dataset_params["batches_per_epoch"]
-        self.smoothing = dataset_params["integer_smoothing"]
+        self.smoothing = 0.01
 
         ckpt_path = os.path.join("data/simple_distr", f"stark_simplex_{self.c}.pt")
         if os.path.isfile(ckpt_path):

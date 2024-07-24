@@ -32,7 +32,7 @@ class BinarizedMNIST(object):
         self.spatial_dims = (32, 32)
         self.dataset: Optional[MNIST] = None
         self.num_classes = 2
-        self.smoothing = dataset_params["integer_smoothing"]
+        self.smoothing = 0.01
 
     def load_data(self, split: str = "train"):
         self.transforms = tv_transforms.Compose([

@@ -1,4 +1,3 @@
 dataset: "coupled_binary"
-integer_smoothing: 0.01
 batches_per_epoch: 500
 eps: 0.05

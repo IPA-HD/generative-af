@@ -6,6 +6,7 @@ data/image/omniglot
 # Logs
 lightning_logs/
 outputs/
+logs_bc/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,5 +1,4 @@
 dataset: "simplex_stark"
 num_classes: 10
-integer_smoothing: 0.01
 batches_per_epoch: 500
 num_val_batches: 32

@@ -32,7 +32,7 @@ class CityscapesSegmentations(object):
         self.scale = dataset_params["scale"]
         self.spatial_dims = (int(1024*self.scale), int(2048*self.scale))
         self.tensor_data: Optional[torch.Tensor] = None
-        self.smoothing = dataset_params["integer_smoothing"]
+        self.smoothing = 0.01
 
     def load_data(self, split: str = "train"):
         data_fpath = os.path.join(f"data/image/cityscapes/cityscapes_{split}_{self.scale}.pt")
