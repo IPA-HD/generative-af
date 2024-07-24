@@ -32,9 +32,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchdiffeq import odeint_adjoint as odeint
-
-from icecream import ic
+from torchdiffeq import odeint_adjoint as odeint  # type: ignore[import-untyped]
 from torch.autograd.functional import jacobian
 from tqdm import tqdm
 

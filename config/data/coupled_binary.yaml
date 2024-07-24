@@ -1,0 +1,3 @@
+dataset: "coupled_binary"
+batches_per_epoch: 500
+eps: 0.05

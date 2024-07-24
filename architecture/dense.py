@@ -3,12 +3,11 @@ Network architectures
 """
 import torch.nn as nn
 import torch
-from .counter import count_forward_calls
+from .base import Vectorfield
 
-@count_forward_calls
-class DenseNet(nn.Module):
+class DenseNet(Vectorfield):
     """Dense Layers, ReLU activation, BatchNorm"""
-    def __init__(self, c, n, hidden_dims, bias=True):
+    def __init__(self, c: int, n: int, hidden_dims: list[int], bias: bool = True):
         super(DenseNet, self).__init__()
         self.hidden_dims = hidden_dims
         self.c = c
@@ -24,17 +23,7 @@ class DenseNet(nn.Module):
             for (d_in, d_out) in zip(feature_seq[:-1], feature_seq[1:])
         ])
 
-    def accepts_data_format(self, batch_shape):
-        if len(batch_shape) < 2:
-            print("Tensor ndim missmatch")
-            return False
-        # dense models can technically accept any spatial and channel dimensions
-        # but this is not the intended use, so at least issue a warning
-        if (batch_shape[self.channel_dim] != self.c) or (batch_shape[2] != self.n):
-            print("Warning: data used for training do not match expected spatial dimensions. Expected", (self.c, self.n), "got", batch_shape[1:])
-        return True
-
-    def forward(self, x, timesteps=None):
+    def counted_forward(self, x, timesteps=None):
         batch_size = x.shape[0]
         other_dims = x.shape[1:]
         if timesteps is None:

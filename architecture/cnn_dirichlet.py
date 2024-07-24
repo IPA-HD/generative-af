@@ -7,7 +7,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from .counter import count_forward_calls
+from .base import Vectorfield
 
 class Dense(nn.Module):
     """
@@ -36,12 +36,11 @@ class GaussianFourierProjection(nn.Module):
 		x_proj = x[:, None] * self.W[None, :] * 2 * np.pi
 		return torch.cat([torch.sin(x_proj), torch.cos(x_proj)], dim=-1)
 
-@count_forward_calls
-class CNNModel(nn.Module):
+class CNNModel(Vectorfield):
 	def __init__(self, alphabet_size, num_cls=1, mode="dirichlet", classifier=False,
 			hidden_dim=128, clean_data=False, cls_expanded_simplex=False,
 			num_cnn_stacks=1, dropout=0.0):
-		super().__init__()
+		super(Vectorfield, self).__init__()
 		#mode = "riemannian" | "dirichlet"
 		self.alphabet_size = alphabet_size
 		self.clean_data = clean_data
@@ -73,7 +72,7 @@ class CNNModel(nn.Module):
 								   nn.ReLU(),
 								   nn.Linear(hidden_dim, self.num_cls))
 
-	def forward(self, seq, timesteps, cls = None, return_embedding=False):
+	def counted_forward(self, seq, timesteps, cls = None, return_embedding=False):
 		if self.clean_data:
 			feat = self.linear(seq)
 			feat = feat.permute(0, 2, 1)
