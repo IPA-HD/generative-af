@@ -12,19 +12,32 @@ conda env create --file environment.yaml
 Training hyperparameters are specified by YAML configuration files in `config/`. We use [hydra](https://hydra.cc/docs/intro/) to parse these files hierarchically, which also allows overwriting from the command line.
 
 ### Training Examples
+
 *Binarized MNIST*
 ```Bash
 python train.py data=mnist logging=epochs model=unet training=mnist
 ```
+
 *Cityscapes Segmentations*
 ```Bash
 python train.py data=cityscapes logging=steps model=unet training=cityscapes
 ```
-*Simple Data Distributions*
+
+*Coupled Binary Variables Toy Distribution*
+```Bash
+python train.py data=coupled_binary logging=frequent model=dense training=simple
+```
+
+*Other Simple Data Distributions*
 ```Bash
 python train.py data=simple data.dataset=pinwheel logging=frequent model=dense training=simple
 ```
-If `data=simple` is set, options for `data.dataset` are `pinwheel`, `gaussian_mixture` and `coupled_binary`.
+If `data=simple` is set, options for `data.dataset` are `pinwheel` and `gaussian_mixture`.
+
+*Scaling to many classes*
+```Bash
+python train.py -m data=num_classes data.num_classes=5,10,20,40,60,80,100,120,140,160 logging=epochs logging.eval_interval_epochs=100 model=cnn training=num_classes
+```
 
 Training artifacts, including model checkpoints, Tensorboard logs and hyperparameters are saved in `lightning_logs/`.
 
