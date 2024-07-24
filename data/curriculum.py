@@ -30,6 +30,9 @@ class Curriculum(Protocol):
     def hist_from_samples(self, labelings: torch.Tensor) -> torch.Tensor:
         ...
 
+    def kl_from_hist(self, p: torch.Tensor) -> torch.Tensor:
+        ...
+
 def new_curriculum(dataset_params: DictConfig) -> Curriculum:
     """
     Returns a training curriculum based on the specified configuration.

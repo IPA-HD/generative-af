@@ -4,7 +4,6 @@ https://github.com/openai/guided-diffusion
 """
 
 from abc import abstractmethod
-from typing import Optional
 
 import numpy as np
 import torch as th
@@ -13,7 +12,7 @@ import torch.nn.functional as F
 
 import math
 from .base import Vectorfield
-
+from typing import Optional
 
 # PyTorch 1.7 has SiLU, but we support PyTorch 1.5.
 class SiLU(nn.Module):
@@ -568,7 +567,7 @@ class QKVAttention(nn.Module):
     def count_flops(model, _x, y):
         return count_flops_attn(model, _x, y)
 
-class UNet(Vectorfield):
+class UNetModel(Vectorfield):
     """
     The full UNet model with attention and timestep embedding.
 
@@ -621,7 +620,7 @@ class UNet(Vectorfield):
         resblock_updown=False,
         use_new_attention_order=False,
     ):
-        super().__init__()
+        super(UNetModel, self).__init__()
 
         if num_heads_upsample == -1:
             num_heads_upsample = num_heads
@@ -841,9 +840,9 @@ class UNet(Vectorfield):
         return self.out(h)
 
 
-class SuperResModel(UNet):
+class SuperResModel(UNetModel):
     """
-    A UNet that performs super-resolution.
+    A UNetModel that performs super-resolution.
 
     Expects an extra kwarg `low_res` to condition on a low-resolution image.
     """
@@ -858,7 +857,7 @@ class SuperResModel(UNet):
         return super().forward(x, timesteps, **kwargs)
 
 
-class EncoderUNet(nn.Module):
+class EncoderUNetModel(nn.Module):
     """
     The half UNet model with attention and timestep embedding.
 

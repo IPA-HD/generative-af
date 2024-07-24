@@ -9,6 +9,7 @@ class Vectorfield(nn.Module):
     architectures defining assignment flow vector fields.
     """
     def __init__(self) -> None:
+        super(Vectorfield, self).__init__()
         self.forward_count: int = 0
         self.channel_dim: int = 1
 

@@ -8,7 +8,7 @@ import math
 from util import mean_free, standard_normal_logprob
 from cnf import ODEfunc, CNF
 from torch.nn.functional import softmax, log_softmax
-from scipy.stats import chi2 # type: ignore
+from scipy.stats import chi2  # type: ignore[import-untyped]
 from architecture import Vectorfield
 
 def orthonormal_tangent_basis(c: int):
@@ -37,16 +37,16 @@ def tangent_to_coord(Q: torch.Tensor, v: torch.Tensor, dim: int = 1):
     return torch.einsum("ji,bj...->bi...", Q, mean_free(v))
 
 def af_as_cnf(net: Vectorfield, Q: torch.Tensor, t_end: float = 1.0, 
-        div_method="hutchinson_gauss", hutchinson_samples: int = 100, 
+        div_method: str = "hutchinson_gauss", hutchinson_samples: int = 100, 
         atol: float = 1e-2, rtol: float = 1e-2, 
         dim: int = 1, reverse_time: bool = True):
 
     c = Q.shape[0]
 
-    def diffeq(t, y):
+    def diffeq(t: torch.Tensor, y: torch.Tensor):
         v = coord_to_tangent(Q, y, dim=dim)
         w = softmax(v, dim=dim)
-        ts = torch.zeros(y.shape[0], device=y.device)
+        ts = t.expand(y.shape[0])
         F = mean_free(net(w, timesteps=ts), dim=dim)
         return tangent_to_coord(Q, F, dim=dim)
 
@@ -133,6 +133,7 @@ if __name__ == '__main__':
     from tqdm import tqdm
     from util import loglh_to_bitsperdim, generate_random_id
     from data.curriculum import new_curriculum
+    from data.mnist import BinarizedMNIST
 
     parser = argparse.ArgumentParser(
         prog='ComputeLikelihood',
@@ -160,14 +161,15 @@ if __name__ == '__main__':
     hparams = s.hparams["hparams"]
     device = s.device
 
-    ds = new_curriculum(hparams["data"])
+    assert hparams["data"]["dataset"] == "mnist"
+    ds = BinarizedMNIST(hparams["data"])
     dl = ds.dataloader(split="test", batch_size=1)
 
     # how many test data are evaluated
     if limit := args.limit_data:
-        total_data = min(limit, len(ds.dataset))
+        total_data = min(limit, len(ds))
     else:
-        total_data = len(ds.dataset)
+        total_data = len(ds)
 
     bpd_results = np.zeros(total_data)
     for test_ind, w in tqdm(enumerate(dl), total=total_data):

@@ -13,7 +13,7 @@ from flow_matching import matching_step
 import matplotlib.pyplot as plt # type: ignore
 from torch.distributions.gamma import Gamma
 from omegaconf import DictConfig
-from typing import Any, Sequence
+from typing import Any, Sequence, Optional, cast
 
 class FlowMatchingModule(L.LightningModule):
     """Flow matching base module"""
@@ -81,7 +81,6 @@ class FlowMatchingModule(L.LightningModule):
 
     def configure_optimizers(self):
         assert self.training_params.method in ["SGD", "Adam", "AdamW"]
-        optimizer: optim.Optimizer
         if self.training_params.method == "SGD":
             optimizer = optim.SGD(self.net.parameters(), **self.training_params.opt_params)
         elif self.training_params.method == "Adam":
@@ -138,6 +137,7 @@ class ToyDataFlow(FlowMatchingModule):
             self.net = DenseNet(self.c, self.n, **self.model_params)
         self.channel_dim = self.net.channel_dim
         assert self.channel_dim in [1,2]
+        self.val_hist_accumulated: Optional[torch.Tensor]
 
     def on_validation_epoch_start(self) -> None:
         self.num_val_batches = 0
@@ -156,7 +156,7 @@ class ToyDataFlow(FlowMatchingModule):
         self.log("num_fevals", fevals)
     
     def on_validation_epoch_end(self) -> None:
-        hist = self.val_hist_accumulated / self.num_val_batches
+        hist = cast(torch.Tensor, self.val_hist_accumulated) / self.num_val_batches
         kl = self.data.kl_from_hist(hist).item()
         if self.n == 2:
             # save histogram as figure
