@@ -50,3 +50,14 @@ python scale_cityscapes.py /path/to/raw/data 0.125 train
 The second argument is a scaling factor for spatial dimensions (preprocessed files will be subsampled by a factor of 8 with interpolation mode `PIL.Image.NEAREST`). The number of segments will also be reduced, corresponding to the `category` of segments in the [Cityscapes torchvision dataset](https://pytorch.org/vision/main/generated/torchvision.datasets.Cityscapes.html).
 Preprocessed Cityscapes segmentation data are saved to `data/image/cityscapes/cityscapes_{split}_{scale}.pt`.
 
+# Citation
+```
+@article{Boll:2024ac,
+	author = {Boll, B. and Gonzalez-Alvarado, D. and Petra, S. and Schn\"{o}rr, C.},
+	journal = {preprint arXiv:2406.04527},
+	title = {{Generative Assignment Flows for Representing and Learning Joint Distributions of Discrete Data}},
+	year = {2024},
+	Url = {https://arxiv.org/abs/2406.04527},
+	Pdf = {Papers/Boll2024ac.pdf}
+}
+```
