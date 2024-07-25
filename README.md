@@ -57,7 +57,6 @@ Preprocessed Cityscapes segmentation data are saved to `data/image/cityscapes/ci
 	journal = {preprint arXiv:2406.04527},
 	title = {{Generative Assignment Flows for Representing and Learning Joint Distributions of Discrete Data}},
 	year = {2024},
-	Url = {https://arxiv.org/abs/2406.04527},
-	Pdf = {Papers/Boll2024ac.pdf}
+	Url = {https://arxiv.org/abs/2406.04527}
 }
 ```
